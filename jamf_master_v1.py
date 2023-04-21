@@ -195,8 +195,12 @@ class MyGUI():
         self.usable_data = self.generate_usable_data(self.data_dump)
         self.hardware_data = self.usable_data[13][1]
         self.storage_data = self.usable_data[7][1]["disks"][0]
+        if len(self.storage_data) > 1:
+            self.storage_data = self.compare_storage_disks()
+        else:
+            self.storage_data = self.usable_data[7][1]["disks"][0]
         self.os_data = self.usable_data[19][1]
-
+        
         values = (self.lbl_desc_value, self.lbl_brand_value, self.lbl_model_value, self.lbl_year_value, self.lbl_screen_size_value, self.lbl_storage_value,
                   self.lbl_ram_value, self.lbl_cpu_value, self.lbl_os_value, self.lbl_serial_value)
         
@@ -211,6 +215,8 @@ class MyGUI():
             self.desc = "iMac"
         elif "macmini" in self.desc:
             self.desc = "MacMini"
+        elif "macpro" in self.desc:
+            self.desc = "Mac Pro"
     
         # Brand
         self.brand = self.hardware_data["make"]
@@ -245,7 +251,7 @@ class MyGUI():
         elif "2015" in self.year:
             self.year = "2015"
         else:
-            self.year = "OLD"
+            self.year = "2013"
 
         # Screen Size
         if "27-Inch" in self.hardware_data["model"] or "27-inch" in self.hardware_data["model"]:
@@ -307,6 +313,14 @@ class MyGUI():
 
         self.final_data = (self.location, self.category, self.name, self.desc, self.brand, self.model, self.year, self.screen_size, self.storage, self.ram, self.cpu, self.os, self.serial)
 
+    def compare_storage_disks(self):
+        disk1 = self.usable_data[7][1]["disks"][0]
+        disk2 = self.usable_data[7][1]["disks"][1]
+
+        if disk1["sizeMegabytes"] > disk2["sizeMegabytes"]:
+            return disk1
+        else:
+            return disk2
 
     def copy_clipboard(self):
         clip = ",".join(self.final_data)
