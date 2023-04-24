@@ -194,7 +194,7 @@ class MyGUI():
         self.data_dump = self.response.json()
         self.usable_data = self.generate_usable_data(self.data_dump)
         self.hardware_data = self.usable_data[13][1]
-        self.storage_data = self.usable_data[7][1]["disks"][0]
+        self.storage_data = self.usable_data[7][1]["disks"]
         if len(self.storage_data) > 1:
             self.storage_data = self.compare_storage_disks()
         else:
