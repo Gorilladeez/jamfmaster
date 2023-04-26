@@ -3,15 +3,22 @@ import requests
 import csv
 import os
 
+
 # test serial - YDWKV9MCQ6
 # test imac - D25RD0PMGQ18
 # test air - C02DR4YTQ6LT
 # test mini - C07Y51GDJYW0
 
-class MyGUI():
+class MyGUI:
 
     def __init__(self):
 
+        self.os_data = None
+        self.storage_data = None
+        self.hardware_data = None
+        self.data_dump = None
+        self.user_data = None
+        self.usable_data = None
         self.token = ""
         self.response = ""
         self.location = ""
@@ -47,13 +54,12 @@ class MyGUI():
         self.username_box.place(relx=0.5, rely=0.4, anchor="center")
         self.username_box.insert(0, "username")
         self.username_box.bind("<Button-1>", self.delete_placeholder)
-    
 
         self.password_box = tk.Entry(self.frame1, show="*")
         self.password_box.place(relx=0.5, rely=0.5, anchor="center")
         self.password_box.insert(0, "password")
         self.password_box.bind("<Button-1>", self.delete_placeholder)
-        
+
         # login button
         self.btn_login = tk.Button(self.frame1, text="Log In", font=("Arial", 16), command=self.get_bearer_token)
         self.btn_login.place(relx=0.5, rely=0.6, anchor="center")
@@ -63,29 +69,25 @@ class MyGUI():
 
         # ============================= RESULTS PAGE =========================================
 
-        # Searchbox
-        self.searchbox = tk.Entry(self.frame2)
-        self.searchbox.place(relx=0.3)
-        #self.searchbox.grid(row=0, column=2, columnspan=2, pady=10)
+        # Searchbar
+        self.search_box = tk.Entry(self.frame2)
+        self.search_box.place(relx=0.3)
 
-            
         self.search_btn = tk.Button(self.frame2, text="Search", font=("Arial", 16), command=self.authorize_b_token)
-        self.search_btn.grid(row=0,column=6, columnspan=2)
+        self.search_btn.grid(row=0, column=6, columnspan=2)
 
-        self.lbl_results = tk.Label(self.frame2, text="", font= ("Arial", 16, "bold"), width=14)
+        self.lbl_results = tk.Label(self.frame2, text="", font=("Arial", 16, "bold"), width=14)
         self.lbl_results.grid(row=1, column=4, pady=5)
 
         self.lbl_desc = tk.Label(self.frame2, text="Desc", font=("Arial", 16, "bold", "underline"), width=11)
         self.lbl_desc.grid(row=2, column=0)
         self.lbl_desc_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_desc_value.grid(row=3, column=0, pady=5)
-        
 
         self.lbl_brand = tk.Label(self.frame2, text="Brand", font=("Arial", 16, "bold", "underline"), width=5)
         self.lbl_brand.grid(row=2, column=1)
         self.lbl_brand_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_brand_value.grid(row=3, column=1, pady=5)
-        
 
         self.lbl_model = tk.Label(self.frame2, text="Model", font=("Arial", 16, "bold", "underline"), width=6)
         self.lbl_model.grid(row=2, column=2)
@@ -97,12 +99,13 @@ class MyGUI():
         self.lbl_year_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_year_value.grid(row=3, column=3, pady=5)
 
-        self.lbl_screen_size = tk.Label(self.frame2, text="Screen size", font=("Arial", 16, "bold", "underline"), width=14)
+        self.lbl_screen_size = tk.Label(self.frame2, text="Screen size", font=("Arial", 16, "bold", "underline"),
+                                        width=14)
         self.lbl_screen_size.grid(row=2, column=4)
         self.lbl_screen_size_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_screen_size_value.grid(row=3, column=4, pady=5)
 
-        self.lbl_storage = tk.Label(self.frame2, text="Storage", font=("Arial", 16, "bold", "underline"),width=7)
+        self.lbl_storage = tk.Label(self.frame2, text="Storage", font=("Arial", 16, "bold", "underline"), width=7)
         self.lbl_storage.grid(row=2, column=5)
         self.lbl_storage_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_storage_value.grid(row=3, column=5, pady=5)
@@ -127,22 +130,21 @@ class MyGUI():
         self.lbl_serial_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_serial_value.grid(row=3, column=9, pady=5)
 
-        self.clipboard_btn = tk.Button(self.frame2, text="Copy Clipboard", font=("Arial", 16), command=self.copy_clipboard)
+        self.clipboard_btn = tk.Button(self.frame2, text="Copy Clipboard", font=("Arial", 16),
+                                       command=self.copy_clipboard)
         self.export_btn = tk.Button(self.frame2, text="Export to CSV", font=("Arial", 16), command=self.export_csv)
         self.clipboard_btn.place(relx=0.6, rely=0.87)
         self.export_btn.place(relx=0.8, rely=0.87)
 
-
-        
         self.show_frame(self.frame1)
         self.window.mainloop()
 
-    #****************************************** END MAIN WINDOW ***************************************************#
+    # ****************************************** END MAIN WINDOW ***************************************************#
 
-    #******************************************** FUNCTIONS *******************************************************#
+    # ******************************************** FUNCTIONS *******************************************************#
     def show_frame(self, frame):
         self.frame1.tkraise()
-       
+
     def delete_placeholder(self, arg):
         if self.username_box.get() == "username":
             self.username_box.delete(0, tk.END)
@@ -164,7 +166,6 @@ class MyGUI():
             case 401:
                 self.lbl_login.config(text="Invalid username/password", fg="red")
 
-
     def generate_usable_data(self, data_dump):
         try:
             self.usable_data = []
@@ -178,19 +179,17 @@ class MyGUI():
         except:
             self.lbl_results.config(text="No results found!", fg="red")
 
-
     def authorize_b_token(self):
 
-        self.serial = self.searchbox.get()
+        self.serial = self.search_box.get()
         url = f"https://jamf-gcp.lucasfilm.com/api/v1/computers-inventory?section=STORAGE&section=HARDWARE&section=OPERATING_SYSTEM&filter=hardware.serialNumber%3D%3D%22{self.serial}%22"
 
         headers = {
-        "accept": "application/json", 
-        "Authorization": f"Bearer {self.token}"
+            "accept": "application/json",
+            "Authorization": f"Bearer {self.token}"
         }
         self.response = requests.get(url, headers=headers, verify=False)
 
-       
         self.data_dump = self.response.json()
         self.usable_data = self.generate_usable_data(self.data_dump)
         self.hardware_data = self.usable_data[13][1]
@@ -200,10 +199,6 @@ class MyGUI():
         else:
             self.storage_data = self.usable_data[7][1]["disks"][0]
         self.os_data = self.usable_data[19][1]
-        
-        values = (self.lbl_desc_value, self.lbl_brand_value, self.lbl_model_value, self.lbl_year_value, self.lbl_screen_size_value, self.lbl_storage_value,
-                  self.lbl_ram_value, self.lbl_cpu_value, self.lbl_os_value, self.lbl_serial_value)
-        
 
         # Description
         self.desc = self.hardware_data["modelIdentifier"].lower()
@@ -217,7 +212,7 @@ class MyGUI():
             self.desc = "MacMini"
         elif "macpro" in self.desc:
             self.desc = "Mac Pro"
-    
+
         # Brand
         self.brand = self.hardware_data["make"]
 
@@ -272,7 +267,7 @@ class MyGUI():
             self.storage = "512GB"
         elif self.storage_data["sizeMegabytes"] >= 250000:
             self.storage = "256GB"
-            
+
         # RAM
         self.ram = self.hardware_data["totalRamMegabytes"]
         if self.ram >= 100000 and self.ram <= 130000:
@@ -292,7 +287,6 @@ class MyGUI():
 
         self.cpu = "CPU"
         self.os = self.os_data["version"]
-        self.serial = self.serial
 
         values_dict = {
             self.lbl_desc_value: self.desc,
@@ -311,7 +305,9 @@ class MyGUI():
             key.config(text="")
             key.config(text=value)
 
-        self.final_data = (self.location, self.category, self.name, self.desc, self.brand, self.model, self.year, self.screen_size, self.storage, self.ram, self.cpu, self.os, self.serial)
+        self.final_data = (
+            self.location, self.category, self.name, self.desc, self.brand, self.model, self.year, self.screen_size,
+            self.storage, self.ram, self.cpu, self.os, self.serial)
 
     def compare_storage_disks(self):
         disk1 = self.usable_data[7][1]["disks"][0]
@@ -327,7 +323,6 @@ class MyGUI():
         self.window.clipboard_clear()
         self.window.clipboard_append(clip)
 
-
     def export_csv(self):
         # write/append to csv file
         documents_path = os.path.expanduser("~/Documents")
@@ -336,4 +331,6 @@ class MyGUI():
         with open(csv_path, "a", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(self.final_data)
+
+
 MyGUI()
