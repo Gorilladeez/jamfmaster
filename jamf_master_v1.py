@@ -9,7 +9,7 @@ import os
 # test air - C02DR4YTQ6LT
 # test mini - C07Y51GDJYW0
 
-class MyGUI:
+class JAMFMASTER:
 
     def __init__(self):
 
@@ -73,7 +73,7 @@ class MyGUI:
         self.search_box = tk.Entry(self.frame2)
         self.search_box.place(relx=0.3)
 
-        self.search_btn = tk.Button(self.frame2, text="Search", font=("Arial", 16), command=self.authorize_b_token)
+        self.search_btn = tk.Button(self.frame2, text="Search", font=("Arial", 16), command=self.generate_search_results)
         self.search_btn.grid(row=0, column=6, columnspan=2)
 
         self.lbl_results = tk.Label(self.frame2, text="", font=("Arial", 16, "bold"), width=14)
@@ -143,7 +143,7 @@ class MyGUI:
 
     # ******************************************** FUNCTIONS *******************************************************#
     def show_frame(self, frame):
-        self.frame1.tkraise()
+        frame.tkraise()
 
     def delete_placeholder(self, arg):
         if self.username_box.get() == "username":
@@ -179,7 +179,7 @@ class MyGUI:
         except:
             self.lbl_results.config(text="No results found!", fg="red")
 
-    def authorize_b_token(self):
+    def generate_search_results(self):
 
         self.serial = self.search_box.get()
         url = f"https://jamf-gcp.lucasfilm.com/api/v1/computers-inventory?section=STORAGE&section=HARDWARE&section=OPERATING_SYSTEM&filter=hardware.serialNumber%3D%3D%22{self.serial}%22"
@@ -218,12 +218,14 @@ class MyGUI:
 
         # Model
         self.model = self.hardware_data["processorType"]
-        if "M1 Pro" in self.model:
+        if "MacBook Pro" in self.desc and "M1" in self.model:
             self.model = "M1 Pro"
-        elif "Apple M1" in self.model and "Air" in self.hardware_data["model"]:
+        elif "MacBook Air" in self.desc and "M1" in self.model:
             self.model = "M1 Air"
-        elif "iMac" in self.hardware_data["model"]:
+        elif "iMac" in self.desc:
             self.model = "iMac"
+        elif "MacMini" in self.desc and "M1" in self.model:
+            self.model = "M1"
         else:
             self.model = "Intel"
 
@@ -333,4 +335,4 @@ class MyGUI:
             writer.writerow(self.final_data)
 
 
-MyGUI()
+JAMFMASTER()
