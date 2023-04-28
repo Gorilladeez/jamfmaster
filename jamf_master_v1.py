@@ -76,6 +76,7 @@ class JAMFMASTER:
         self.search_btn = tk.Button(self.frame2, text="Search", font=("Arial", 16), command=self.generate_search_results)
         self.search_btn.grid(row=0, column=6, columnspan=2)
 
+        # Labels
         self.lbl_results = tk.Label(self.frame2, text="", font=("Arial", 16, "bold"), width=14)
         self.lbl_results.grid(row=1, column=4, pady=5)
 
@@ -272,17 +273,17 @@ class JAMFMASTER:
 
         # RAM
         self.ram = self.hardware_data["totalRamMegabytes"]
-        if self.ram >= 100000 and self.ram <= 130000:
+        if 100000 <= self.ram <= 130000:
             self.ram = "128GB"
-        elif self.ram >= 60000 and self.ram <= 66000:
+        elif 60000 <= self.ram <= 66000:
             self.ram = "64GB"
-        elif self.ram >= 30000 and self.ram <= 33000:
+        elif 30000 <= self.ram <= 33000:
             self.ram = "32GB"
-        elif self.ram >= 16000 and self.ram <= 16600:
+        elif 16000 <= self.ram <= 16600:
             self.ram = "16GB"
-        elif self.ram >= 12000 and self.ram <= 12200:
+        elif 12000 <= self.ram <= 12200:
             self.ram = "12GB"
-        elif self.ram >= 8000 and self.ram <= 8200:
+        elif 8000 <= self.ram <= 8200:
             self.ram = "8GB"
         else:
             self.ram = "4GB"
