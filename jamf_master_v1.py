@@ -256,6 +256,8 @@ class JAMFMASTER:
             self.screen_size = "27\""
         elif "16-Inch" in self.hardware_data["model"] or "16-inch" in self.hardware_data["model"]:
             self.screen_size = "16\""
+        elif "15-Inch" in self.hardware_data["model"] or "15-inch" in self.hardware_data["model"]:
+            self.screen_size = "15\""
         elif "14-Inch" in self.hardware_data["model"] or "14-inch" in self.hardware_data["model"]:
             self.screen_size = "14\""
         elif "13-Inch" in self.hardware_data["model"] or "13-inch" in self.hardware_data["model"]:
