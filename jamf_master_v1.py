@@ -237,7 +237,8 @@ class JAMFMASTER:
     def generate_search_results(self):
 
         self.serial = self.search_box.get()
-        url = f"https://jamf-gcp.lucasfilm.com/api/v1/computers-inventory?section=STORAGE&section=HARDWARE&section=OPERATING_SYSTEM&filter=hardware.serialNumber%3D%3D%22{self.serial}%22"
+        url = f"https://jamf-gcp.lucasfilm.com/api/v1/computers-inventory?section=STORAGE&section=HARDWARE&section" \
+              f"=OPERATING_SYSTEM&filter=hardware.serialNumber%3D%3D%22{self.serial}%22 "
 
         headers = {
             "accept": "application/json",
