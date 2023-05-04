@@ -32,7 +32,7 @@ class JAMFMASTER:
 
         self.window = tk.Tk()
         self.window.title("JAMF Master v1.0")
-        self.window.geometry("760x300")
+        self.window.geometry("850x300")
         self.window.resizable(height=0, width=0)
         self.window.rowconfigure(0, weight=1)
         self.window.columnconfigure(0, weight=1)
@@ -95,8 +95,7 @@ class JAMFMASTER:
         self.lbl_year_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_year_value.grid(row=3, column=3, pady=5)
 
-        self.lbl_screen_size = tk.Label(self.frame2, text="Screen size", font=("Arial", 16, "bold", "underline"),
-                                        width=14)
+        self.lbl_screen_size = tk.Label(self.frame2, text="Screen size", font=("Arial", 16, "bold", "underline"), width=14)
         self.lbl_screen_size.grid(row=2, column=4)
         self.lbl_screen_size_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_screen_size_value.grid(row=3, column=4, pady=5)
@@ -111,12 +110,12 @@ class JAMFMASTER:
         self.lbl_ram_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_ram_value.grid(row=3, column=6, pady=5)
 
-        self.lbl_cpu = tk.Label(self.frame2, text="CPU", font=("Arial", 16, "bold", "underline"), width=5)
+        self.lbl_cpu = tk.Label(self.frame2, text="CPU", font=("Arial", 16, "bold", "underline"), width=7)
         self.lbl_cpu.grid(row=2, column=7)
         self.lbl_cpu_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_cpu_value.grid(row=3, column=7, pady=5)
 
-        self.lbl_os = tk.Label(self.frame2, text="OS", font=("Arial", 16, "bold", "underline"), width=7)
+        self.lbl_os = tk.Label(self.frame2, text="OS", font=("Arial", 16, "bold", "underline"), width=14)
         self.lbl_os.grid(row=2, column=8)
         self.lbl_os_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_os_value.grid(row=3, column=8, pady=5)
@@ -126,8 +125,7 @@ class JAMFMASTER:
         self.lbl_serial_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_serial_value.grid(row=3, column=9, pady=5)
 
-        self.clipboard_btn = tk.Button(self.frame2, text="Copy Clipboard", font=("Arial", 16),
-                                       command=self.copy_clipboard)
+        self.clipboard_btn = tk.Button(self.frame2, text="Copy Clipboard", font=("Arial", 16), command=self.copy_clipboard)
         self.export_btn = tk.Button(self.frame2, text="Export to CSV", font=("Arial", 16), command=self.export_csv)
         self.clipboard_btn.place(relx=0.6, rely=0.87)
         self.export_btn.place(relx=0.8, rely=0.87)
@@ -175,7 +173,7 @@ class JAMFMASTER:
         except:
             self.lbl_results.config(text="No results found!", fg="red")
 
-    def find_model_number(self, identifier):
+    def get_model_number(self, identifier):
 
         model_numbers = {
             # M1/M2 Pros
@@ -274,18 +272,7 @@ class JAMFMASTER:
         self.brand = self.hardware_data["make"]
 
         # Model
-        self.model = self.find_model_number(self.hardware_data["modelIdentifier"])
-
-        # if "MacBook Pro" in self.desc and "M1" in self.model:
-        #     self.model = "M1 Pro"
-        # elif "MacBook Air" in self.desc and "M1" in self.model:
-        #     self.model = "M1 Air"
-        # elif "iMac" in self.desc:
-        #     self.model = "iMac"
-        # elif "MacMini" in self.desc and "M1" in self.model:
-        #     self.model = "M1"
-        # else:
-        #     self.model = "Intel"
+        self.model = self.get_model_number(self.hardware_data["modelIdentifier"])
 
         # Year    
         self.year = self.hardware_data["model"]
