@@ -4,11 +4,6 @@ import csv
 import os
 
 
-# test serial - YDWKV9MCQ6
-# test imac - D25RD0PMGQ18
-# test air - C02DR4YTQ6LT
-# test mini - C07Y51GDJYW0
-
 class JAMFMASTER:
 
     def __init__(self):
@@ -180,6 +175,65 @@ class JAMFMASTER:
         except:
             self.lbl_results.config(text="No results found!", fg="red")
 
+    def find_model_number(self, identifier):
+
+        model_numbers = {
+            # M1/M2 Pros
+            "Mac14,10": "A2780",
+            "Mac14,6": "A2780",
+            "Mac14,9": "A2779",
+            "Mac14,5": "A2779",
+            "Mac14,7": "A2338",
+            "MacBookPro17,1": "A2338",
+            "MacBookPro18,1": "A2485",
+            "MacBookPro18,2": "A2485",
+            "MacBookPro18,3": "A2442",
+            "MacBookPro18,4": "A2442",
+            # Intel Pros
+            "MacBookPro16,1": "A2141",
+            "MacBookPro16,4": "A2141",
+            "MacBookPro16,2": "A2251",
+            "MacBookPro16,3": "A2289",
+            "MacBookPro15,4": "A2159",
+            "MacBookPro15,3": "A1990",
+            "MacBookPro15,1": "A1990",
+            "MacBookPro15,2": "A1989",
+            "MacBookPro14,3": "A1707",
+            "MacBookPro13,3": "A1707",
+            "MacBookPro14,2": "A1706",
+            "MacBookPro13,2": "A1706",
+            "MacBookPro14,1": "A1708",
+            "MacBookPro13,1": "A1708",
+            "MacBookPro10,1": "A1398",
+            "MacBookPro11,2": "A1398",
+            "MacBookPro11,3": "A1398",
+            "MacBookPro11,4": "A1398",
+            "MacBookPro11,5": "A1398",
+            "MacBookPro11,1": "A1502",
+            "MacBookPro12,1": "A1502",
+            "MacBookPro10,2": "A1425",
+            "MacBookPro9,2": "A1278",
+
+            # M1/M2 Airs
+            "Mac14,2": "A2681",
+            "MacBookAir10,1": "A2337",
+
+            # Intel Airs
+            "MacBookAir9,1": "A2179",
+            "MacBookAir8,2": "A1932",
+            "MacBookAir8,1": "A1932",
+            "MacBookAir7,2": "A1466",
+            "MacBookAir6,2": "A1466",
+            "MacBookAir5,2": "A1466",
+            "MacBookAir7,1": "A1465",
+            "MacBookAir6,1": "A1465",
+            "MacBookAir5,1": "A1465",
+        }
+
+        model = model_numbers.get(identifier)
+
+        return model
+
     def generate_search_results(self):
 
         self.serial = self.search_box.get()
@@ -203,9 +257,10 @@ class JAMFMASTER:
 
         # Description
         self.desc = self.hardware_data["modelIdentifier"].lower()
-        if "macbookpro" in self.desc:
+        if "macbookpro" in self.desc or "14,5" in self.desc or "14,6" in self.desc or "14,7" in self.desc \
+                or "14,9" in self.desc or "14,10" in self.desc:
             self.desc = "MacBook Pro"
-        elif "macbookair" in self.desc:
+        elif "macbookair" in self.desc or "14,2" in self.desc:
             self.desc = "MacBook Air"
         elif "imac" in self.desc:
             self.desc = "iMac"
@@ -218,17 +273,18 @@ class JAMFMASTER:
         self.brand = self.hardware_data["make"]
 
         # Model
-        self.model = self.hardware_data["processorType"]
-        if "MacBook Pro" in self.desc and "M1" in self.model:
-            self.model = "M1 Pro"
-        elif "MacBook Air" in self.desc and "M1" in self.model:
-            self.model = "M1 Air"
-        elif "iMac" in self.desc:
-            self.model = "iMac"
-        elif "MacMini" in self.desc and "M1" in self.model:
-            self.model = "M1"
-        else:
-            self.model = "Intel"
+        self.model = self.find_model_number(self.hardware_data["modelIdentifier"])
+
+        # if "MacBook Pro" in self.desc and "M1" in self.model:
+        #     self.model = "M1 Pro"
+        # elif "MacBook Air" in self.desc and "M1" in self.model:
+        #     self.model = "M1 Air"
+        # elif "iMac" in self.desc:
+        #     self.model = "iMac"
+        # elif "MacMini" in self.desc and "M1" in self.model:
+        #     self.model = "M1"
+        # else:
+        #     self.model = "Intel"
 
         # Year    
         self.year = self.hardware_data["model"]
@@ -254,11 +310,13 @@ class JAMFMASTER:
         # Screen Size
         if "27-Inch" in self.hardware_data["model"] or "27-inch" in self.hardware_data["model"]:
             self.screen_size = "27\""
-        elif "16-Inch" in self.hardware_data["model"] or "16-inch" in self.hardware_data["model"]:
+        elif "16-Inch" in self.hardware_data["model"] or "16-inch" in self.hardware_data["model"] or \
+                "14,6" in self.hardware_data["model"] or "14,10" in self.hardware_data["model"]:
             self.screen_size = "16\""
         elif "15-Inch" in self.hardware_data["model"] or "15-inch" in self.hardware_data["model"]:
             self.screen_size = "15\""
-        elif "14-Inch" in self.hardware_data["model"] or "14-inch" in self.hardware_data["model"]:
+        elif "14-Inch" in self.hardware_data["model"] or "14-inch" in self.hardware_data["model"] or \
+                "14,5" in self.hardware_data["model"] or "14,9" in self.hardware_data["model"]:
             self.screen_size = "14\""
         elif "13-Inch" in self.hardware_data["model"] or "13-inch" in self.hardware_data["model"]:
             self.screen_size = "13\""
@@ -266,7 +324,9 @@ class JAMFMASTER:
             self.screen_size = "13\""
 
         # Storage size
-        if self.storage_data["sizeMegabytes"] >= 1000000:
+        if self.storage_data["sizeMegabytes"] >= 1900000:
+            self.storage = "2TB"
+        elif self.storage_data["sizeMegabytes"] >= 1000000:
             self.storage = "1TB"
         elif self.storage_data["sizeMegabytes"] >= 500000:
             self.storage = "512GB"
@@ -290,8 +350,25 @@ class JAMFMASTER:
         else:
             self.ram = "4GB"
 
-        self.cpu = "CPU"
+        self.cpu = self.hardware_data["processorType"].lower()
+        if "m1" in self.cpu or "m2" in self.cpu:
+            self.cpu = self.cpu[6:].title()
+
         self.os = self.os_data["version"]
+        if self.os.startswith("13"):
+            self.os = f"Ventura {self.os}"
+        elif self.os.startswith("12"):
+            self.os = f"Monterey {self.os}"
+        elif self.os.startswith("11"):
+            self.os = f"Big Sur {self.os}"
+        elif "10.15" in self.os:
+            self.os = f"Catalina {self.os}"
+        elif "10.14" in self.os:
+            self.os = f"Mojave {self.os}"
+        elif "10.13" in self.os:
+            self.os = f"High Sierra {self.os}"
+        elif "10.12" in self.os:
+            self.os = f"Sierra {self.os}"
 
         values_dict = {
             self.lbl_desc_value: self.desc,
