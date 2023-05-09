@@ -2,9 +2,11 @@ import tkinter as tk
 import requests
 import csv
 import os
+import time
+import datetime
 
 
-class JAMFMASTER:
+class JamMaster:
 
     def __init__(self):
 
@@ -15,6 +17,7 @@ class JAMFMASTER:
         self.user_data = None
         self.usable_data = None
         self.token = ""
+        self.token_expire = ""
         self.response = ""
         self.location = ""
         self.category = ""
@@ -32,7 +35,7 @@ class JAMFMASTER:
 
         self.window = tk.Tk()
         self.window.title("JAMF Master v1.0")
-        self.window.geometry("850x300")
+        self.window.geometry("750x300")
         self.window.resizable(height=0, width=0)
         self.window.rowconfigure(0, weight=1)
         self.window.columnconfigure(0, weight=1)
@@ -69,7 +72,7 @@ class JAMFMASTER:
         self.search_box.place(relx=0.3)
 
         self.search_btn = tk.Button(self.frame2, text="Search", font=("Arial", 16), command=self.generate_search_results)
-        self.search_btn.grid(row=0, column=6, columnspan=2)
+        self.search_btn.grid(row=0, column=5, columnspan=2)
 
         # Labels
         self.lbl_results = tk.Label(self.frame2, text="", font=("Arial", 16, "bold"), width=14)
@@ -110,25 +113,28 @@ class JAMFMASTER:
         self.lbl_ram_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_ram_value.grid(row=3, column=6, pady=5)
 
-        self.lbl_cpu = tk.Label(self.frame2, text="CPU", font=("Arial", 16, "bold", "underline"), width=7)
+        self.lbl_cpu = tk.Label(self.frame2, text="CPU", font=("Arial", 16, "bold", "underline"), width=24)
         self.lbl_cpu.grid(row=2, column=7)
         self.lbl_cpu_value = tk.Label(self.frame2, text="", font=("Arial", 16))
         self.lbl_cpu_value.grid(row=3, column=7, pady=5)
 
         self.lbl_os = tk.Label(self.frame2, text="OS", font=("Arial", 16, "bold", "underline"), width=14)
-        self.lbl_os.grid(row=2, column=8)
+        self.lbl_os.grid(row=4, column=4)
         self.lbl_os_value = tk.Label(self.frame2, text="", font=("Arial", 16))
-        self.lbl_os_value.grid(row=3, column=8, pady=5)
+        self.lbl_os_value.grid(row=5, column=4, pady=5)
 
         self.lbl_serial = tk.Label(self.frame2, text="Serial", font=("Arial", 16, "bold", "underline"), width=14)
-        self.lbl_serial.grid(row=2, column=9)
+        self.lbl_serial.grid(row=4, column=5)
         self.lbl_serial_value = tk.Label(self.frame2, text="", font=("Arial", 16))
-        self.lbl_serial_value.grid(row=3, column=9, pady=5)
+        self.lbl_serial_value.grid(row=5, column=5, pady=5)
+
+        self.expire_label = tk.Label(self.frame2, text=self.token_expire, font=("Arial", 16, "bold"), fg="red")
+        self.expire_label.place(relx=0.35, rely=0.7)
 
         self.clipboard_btn = tk.Button(self.frame2, text="Copy Clipboard", font=("Arial", 16), command=self.copy_clipboard)
         self.export_btn = tk.Button(self.frame2, text="Export to CSV", font=("Arial", 16), command=self.export_csv)
-        self.clipboard_btn.place(relx=0.6, rely=0.87)
-        self.export_btn.place(relx=0.8, rely=0.87)
+        self.clipboard_btn.place(relx=0.3, rely=0.87)
+        self.export_btn.place(relx=0.5, rely=0.87)
 
         self.show_frame(self.frame1)
         self.window.mainloop()
@@ -145,6 +151,19 @@ class JAMFMASTER:
         elif self.username_box.get() != "username" and self.password_box.get() == "password":
             self.password_box.delete(0, tk.END)
 
+    def convert_expiration_to_local_time(self, expiration):
+
+        utc_time_str = expiration
+        utc_time = datetime.datetime.strptime(utc_time_str[:-1], "%Y-%m-%dT%H:%M:%S.%f")
+
+        utc_timestamp = time.mktime(utc_time.timetuple())
+        local_timestamp = utc_timestamp + time.timezone
+        local_time = datetime.datetime.fromtimestamp(local_timestamp)
+
+        local_time_hour_min = local_time.strftime("%I:%M %p")
+
+        return f"Token Expires: {local_time_hour_min}"
+
     def get_bearer_token(self):
         username = self.username_box.get()
         password = self.password_box.get()
@@ -155,7 +174,10 @@ class JAMFMASTER:
         match response.status_code:
             case 200:
                 b_token = response.json().get("token")
+                expiration = response.json().get("expires")
                 self.token = b_token
+                self.token_expire = self.convert_expiration_to_local_time(expiration)
+                self.expire_label.config(text=self.token_expire)
                 self.frame2.tkraise()
             case 401:
                 self.lbl_login.config(text="Invalid username/password", fg="red")
@@ -276,7 +298,9 @@ class JAMFMASTER:
 
         # Year    
         self.year = self.hardware_data["model"]
-        if "2022" in self.year:
+        if self.model == "A2779" or self.model == "A2780":
+            self.year = "2023"
+        elif "2022" in self.year or self.model == "A2338" or self.model == "A2681":
             self.year = "2022"
         elif "2021" in self.year:
             self.year = "2021"
@@ -310,6 +334,8 @@ class JAMFMASTER:
             self.screen_size = "13\""
         elif "MacBook Air" in self.hardware_data["model"] and "Apple M1" in self.hardware_data["processorType"]:
             self.screen_size = "13\""
+        else:
+            self.screen_size = None
 
         # Storage size
         if self.storage_data["sizeMegabytes"] >= 1900000:
@@ -403,4 +429,4 @@ class JAMFMASTER:
             writer.writerow(self.final_data)
 
 
-JAMFMASTER()
+JamMaster()
