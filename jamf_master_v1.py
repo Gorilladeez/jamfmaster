@@ -10,6 +10,7 @@ class JamMaster:
 
     def __init__(self):
 
+        self.cpu_speed = None
         self.os_data = None
         self.storage_data = None
         self.hardware_data = None
@@ -35,7 +36,7 @@ class JamMaster:
 
         self.window = tk.Tk()
         self.window.title("JAMF Master v1.0")
-        self.window.geometry("750x300")
+        self.window.geometry("820x300")
         self.window.resizable(height=0, width=0)
         self.window.rowconfigure(0, weight=1)
         self.window.columnconfigure(0, weight=1)
@@ -160,8 +161,19 @@ class JamMaster:
         local_timestamp = utc_timestamp + time.timezone
         local_time = datetime.datetime.fromtimestamp(local_timestamp)
 
-        local_time_hour_min = local_time.strftime("%I:%M %p")
+        local_hour = local_time.hour
+        local_minute = local_time.minute
 
+        print(local_hour)
+        print(local_minute)
+
+        if local_hour >= 12:
+            local_hour -= 12
+            am_pm = "AM"
+        else:
+            am_pm = "PM"
+
+        local_time_hour_min = f"{local_hour:02d}:{local_minute:02d} {am_pm}"
         return f"Token Expires: {local_time_hour_min}"
 
     def get_bearer_token(self):
@@ -248,6 +260,43 @@ class JamMaster:
             "MacBookAir7,1": "A1465",
             "MacBookAir6,1": "A1465",
             "MacBookAir5,1": "A1465",
+
+            # M1/M2 Mac Mini
+            "Mac14,12": "A2816",
+            "Mac14,3": "A2686",
+            "Macmini9,1": "A2348",
+
+            # Intel Mac Mini
+            "Macmini8,1": "A1993",
+
+            # Mac Studio
+            "Mac13,2": "A2615",
+            "Mac13,1": "A2615",
+
+            # M1 iMac
+            "iMac21,2": "A2439",
+            "iMac21,1": "A2438",
+
+            # Intel iMac
+            "iMac20,2": "A2115",
+            "iMac20,1": "A2115",
+            "iMac19,1": "A2115",
+            "iMac19,2": "A2116",
+            "iMacPro1,1": "A1862",
+            "iMac18,3": "A1419",
+            "iMac17,1": "A1419",
+            "iMac15,1": "A1419",
+            "iMac14,2": "A1419",
+            "iMac13,2": "A1419",
+            "iMac18,2": "A1418",
+            "iMac18,1": "A1418",
+            "iMac16,2": "A1418",
+            "iMac16,1": "A1418",
+            "iMac14,4": "A1418",
+            "iMac14,3": "A1418",
+            "iMac14,1": "A1418",
+            "iMac13,1": "A1418",
+
         }
 
         model = model_numbers.get(identifier)
@@ -287,6 +336,8 @@ class JamMaster:
             self.desc = "iMac"
         elif "macmini" in self.desc:
             self.desc = "MacMini"
+        elif "mac13,2" in self.desc:
+            self.desc = "Mac Studio"
         elif "macpro" in self.desc:
             self.desc = "Mac Pro"
 
@@ -300,7 +351,7 @@ class JamMaster:
         self.year = self.hardware_data["model"]
         if self.model == "A2779" or self.model == "A2780":
             self.year = "2023"
-        elif "2022" in self.year or self.model == "A2338" or self.model == "A2681":
+        elif "2022" in self.year or self.model == "A2338" or self.model == "A2681" or self.model == "A2615":
             self.year = "2022"
         elif "2021" in self.year:
             self.year = "2021"
@@ -349,7 +400,7 @@ class JamMaster:
 
         # RAM
         self.ram = self.hardware_data["totalRamMegabytes"]
-        if 100000 <= self.ram <= 130000:
+        if 100000 <= self.ram <= 132000:
             self.ram = "128GB"
         elif 60000 <= self.ram <= 66000:
             self.ram = "64GB"
@@ -364,10 +415,15 @@ class JamMaster:
         else:
             self.ram = "4GB"
 
-        self.cpu = self.hardware_data["processorType"].lower()
-        if "m1" in self.cpu or "m2" in self.cpu:
+        # CPU
+        self.cpu = self.hardware_data["processorType"]
+        self.cpu_speed = self.hardware_data["processorSpeedMhz"]
+        if "M1" in self.cpu or "M2" in self.cpu:
             self.cpu = self.cpu[6:].title()
+        else:
+            self.cpu = f"{self.cpu_speed / 1000:.1f} GHz {self.cpu}"
 
+        # OS
         self.os = self.os_data["version"]
         if self.os.startswith("13"):
             self.os = f"Ventura {self.os}"
