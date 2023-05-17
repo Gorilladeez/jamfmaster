@@ -268,6 +268,7 @@ class JamMaster:
 
             # Intel Mac Mini
             "Macmini8,1": "A1993",
+            "Macmini7,1": "A1347",
 
             # Mac Studio
             "Mac13,2": "A2615",
@@ -367,6 +368,8 @@ class JamMaster:
             self.year = "2016"
         elif "2015" in self.year:
             self.year = "2015"
+        elif "2014" in self.year:
+            self.year = "2014"
         else:
             self.year = "2013"
 
